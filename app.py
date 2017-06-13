@@ -43,7 +43,7 @@ def webget():
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     result = urlopen(yql_url).read()
     data = json.loads(result)
-    res = makeWebhookResult(data,yql_url)
+    res = makeWebhookResult(data,"Tomorrow")
 
     res = json.dumps(res, indent=4)
     # print(res)
@@ -62,7 +62,21 @@ def processRequest(req):
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     result = urlopen(yql_url).read()
     data = json.loads(result)
-    res = makeWebhookResult(data,yql_url)
+    
+    result = req.get("result")
+    parameters = result.get("parameters")
+    time = parameters.get("time")
+    if time is None:
+      time = ""
+    else:
+      if time == "tomorrow":
+        time = " limit 2 "
+      elif time > 1:
+        time = " limit " + time + " "
+      else:
+        time = ""
+
+    res = makeWebhookResult(data,time)
     return res
 
 
@@ -78,17 +92,18 @@ def makeYqlQuery(req):
       time = ""
     else:
       if time == "tomorrow":
-        time = " limit 2 "
+        time = " Tomorrow "
       elif time > 1:
-        time = " limit " + time + " "
+        time = "After " + time + " days "
       else:
         time = ""
 
     return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "') " + time
 
 
-def makeWebhookResult(data,url):
+def makeWebhookResult(data,time):
     query = data.get('query')
+    url = "failed"
     if query is None:
         return {
             "speech": "url",
@@ -126,16 +141,20 @@ def makeWebhookResult(data,url):
         return {}
 
     # print(json.dumps(item, indent=4))
-
-    speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
+ 
+    if time is None:
+        speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
              ", the temperature is " + condition.get('temp') + " " + units.get('temperature')
-
+    else:
+        forecast = item.get('forecast')
+        speech =  time + " the forecast for " + location.get('city') + ": " + forecast[-1].get('text')+ \
+             ", the temperature can range between " + forecast[-1].get('low') + units.get('temperature') + " to " + forecast[-1].get('high') + units.get('temperature')
     print("Response:")
     print(speech)
 
     return {
-        "speech": speech+url,
-        "displayText": speech+url,
+        "speech": speech,
+        "displayText": speech,
         # "data": data,
         # "contextOut": [],
         "source": "apiai-weather-webhook-sample"
