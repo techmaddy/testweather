@@ -45,7 +45,7 @@ def processRequest(req):
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     result = urlopen(yql_url).read()
     data = json.loads(result)
-    res = makeWebhookResult(data)
+    res = makeWebhookResult(data,yql_url)
     return res
 
 
@@ -70,19 +70,34 @@ def makeYqlQuery(req):
     return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')  limit 1"
 
 
-def makeWebhookResult(data):
+def makeWebhookResult(data,url):
     query = data.get('query')
     if query is None:
-        return {}
-
+        return {
+            "speech": "url",
+            "displayText": url,
+            # "data": data,
+            # "contextOut": [],
+            "source": "apiai-weather-webhook-sample"
+        }
     result = query.get('results')
     if result is None:
-        return {}
-
+        return {
+            "speech": "url",
+            "displayText": url,
+            # "data": data,
+            # "contextOut": [],
+            "source": "apiai-weather-webhook-sample"
+        }
     channel = result.get('channel')
     if channel is None:
-        return {}
-
+        return {
+            "speech": "url",
+            "displayText": url,
+            # "data": data,
+            # "contextOut": [],
+            "source": "apiai-weather-webhook-sample"
+        }
     item = channel.get('item')
     location = channel.get('location')
     units = channel.get('units')
@@ -103,7 +118,7 @@ def makeWebhookResult(data):
 
     return {
         "speech": speech,
-        "displayText": speech,
+        "displayText": speech+url,
         # "data": data,
         # "contextOut": [],
         "source": "apiai-weather-webhook-sample"
