@@ -34,6 +34,23 @@ def webhook():
     r.headers['Content-Type'] = 'application/json'
     return r
 
+@app.route('/webget', methods=['GET'])
+def webget():
+    print("Request:")
+    print(json.dumps(req, indent=4))
+
+    baseurl = "https://query.yahooapis.com/v1/public/yql?"
+    yql_url = baseurl + urlencode({'q': "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + newyork + "') limit 2" }) + "&format=json"
+    result = urlopen(yql_url).read()
+    data = json.loads(result)
+    res = makeWebhookResult(data,yql_url)
+
+    res = json.dumps(res, indent=4)
+    # print(res)
+    r = make_response(res)
+    r.headers['Content-Type'] = 'application/json'
+    return r
+
 
 def processRequest(req):
     if req.get("result").get("action") != "yahooWeatherForecast":
@@ -117,7 +134,7 @@ def makeWebhookResult(data,url):
     print(speech)
 
     return {
-        "speech": speech,
+        "speech": speech+url,
         "displayText": speech+url,
         # "data": data,
         # "contextOut": [],
