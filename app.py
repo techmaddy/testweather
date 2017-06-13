@@ -34,40 +34,25 @@ def webhook():
     r.headers['Content-Type'] = 'application/json'
     return r
 
-@app.route('/webget', methods=['GET'])
-def webget():
-    req = request.get_json(silent=True, force=True)
-
-    print("Request:GET")
-
-    res = "Testing the server"
-    res = json.dumps(res, indent=4)
-    # print(res)
-    r = make_response(res)
-    r.headers['Content-Type'] = 'application/json'
-    return r
-
 
 def processRequest(req):
     if req.get("result").get("action") != "yahooWeatherForecast":
         return {}
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
     yql_query = makeYqlQuery(req)
-    
+    if yql_query is None:
+        return {}
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
-    res = "Testing the server:"+yql_url
-    res = json.dumps(res, indent=4)
-    # print(res)
-    r = make_response(res)
-    r.headers['Content-Type'] = 'application/json'
+    result = urlopen(yql_url).read()
+    data = json.loads(result)
+    res = makeWebhookResult(data)
+    return res
 
 
 def makeYqlQuery(req):
     result = req.get("result")
     parameters = result.get("parameters")
     city = parameters.get("geo-city")
-    time = ""
-
     if city is None:
         return None
 
