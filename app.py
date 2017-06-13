@@ -53,13 +53,13 @@ def processRequest(req):
         return {}
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
     yql_query = makeYqlQuery(req)
-    if yql_query is None:
-        return {}
+    
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
-    result = urlopen(yql_url).read()
-    data = json.loads(result) 
-    res = makeWebhookResult(data) + yql_url
-    return res
+    res = "Testing the server:"+yql_url
+    res = json.dumps(res, indent=4)
+    # print(res)
+    r = make_response(res)
+    r.headers['Content-Type'] = 'application/json'
 
 
 def makeYqlQuery(req):
