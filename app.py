@@ -70,9 +70,9 @@ def processRequest(req):
       time = ""
     else:
       if time == "tomorrow":
-        time = " limit 2 "
+        time = " Tomorrow "
       elif time > 1:
-        time = " limit " + time + " "
+        time = "After " + time + " days "
       else:
         time = ""
 
@@ -92,9 +92,9 @@ def makeYqlQuery(req):
       time = ""
     else:
       if time == "tomorrow":
-        time = " Tomorrow "
+        time = " limit 2 "
       elif time > 1:
-        time = "After " + time + " days "
+        time = " limit " + time + " "
       else:
         time = ""
 
@@ -142,7 +142,7 @@ def makeWebhookResult(data,time):
 
     # print(json.dumps(item, indent=4))
  
-    if time is None:
+    if time == "":
         speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
              ", the temperature is " + condition.get('temp') + " " + units.get('temperature')
     else:
