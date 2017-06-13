@@ -71,6 +71,8 @@ def processRequest(req):
     else:
       if time == "tomorrow":
         time = " Tomorrow "
+      elif time == "yesterday":
+        time = "yesterday"
       elif time > 1:
         time = "After " + time + " days "
       else:
@@ -93,6 +95,8 @@ def makeYqlQuery(req):
     else:
       if time == "tomorrow":
         time = " limit 2 "
+      elif time == "yesterday":
+        time = ""
       elif time > 1:
         time = " limit " + time + " "
       else:
@@ -145,6 +149,9 @@ def makeWebhookResult(data,time):
     if time == "":
         speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
              ", the temperature is " + condition.get('temp') + " " + units.get('temperature')
+    elif time == "":
+        speech = "I don't have information for yesterday. But today in " + location.get('city') + ": " + condition.get('text') + \
+             ", the temperature is " + condition.get('temp') + " " + units.get('temperature')    
     else:
         forecast = item.get('forecast')
         speech =  time + " the forecast for " + location.get('city') + ": " + forecast[-1].get('text')+ \
