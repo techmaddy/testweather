@@ -56,6 +56,17 @@ def makeYqlQuery(req):
     if city is None:
         return None
 
+    time = parameters.get("time")
+    if time is None:
+      time = ""
+    else:
+      if time == "tomorrow":
+        time = " limit 2 "
+      elif time > 1:
+        time = " limit " + time + " "
+      else:
+        time = ""
+
     return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
 
 
