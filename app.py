@@ -40,7 +40,8 @@ def webget():
     print(json.dumps(req, indent=4))
 
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
-    yql_url = baseurl + urlencode({'q': "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + newyork + "') limit 2" }) + "&format=json"
+    yql_query ="select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='newyork') limit 2"
+    yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     result = urlopen(yql_url).read()
     data = json.loads(result)
     res = makeWebhookResult(data,yql_url)
