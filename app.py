@@ -66,16 +66,7 @@ def makeYqlQuery(req):
     result = req.get("result")
     parameters = result.get("parameters")
     city = parameters.get("geo-city")
-    time = parameters.get("time")
-    if time is None:
-      time = ""
-    else:
-      if time == "tomorrow":
-        time = " limit 2 "
-      elif time > 1:
-        time = " limit " + time + " "
-      else:
-        time = ""
+    time = ""
 
     if city is None:
         return None
