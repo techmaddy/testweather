@@ -41,7 +41,7 @@ def webget():
     print("Request:")
 
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
-    reqdata = '{"result": {"source": "agent","resolvedQuery": "weather in london","action": "yahooWeatherForecast","actionIncomplete": "false","parameters": {"geo-city": "hyderabad","time": "tomorrow"}}}'
+    reqdata = '{"result": {"source": "agent","resolvedQuery": "weather in london","action": "yahooWeatherForecast","actionIncomplete": "false","parameters": {"geo-city": "hyderabad","time": ""}}}'
     #req=json.dumps(['foo', {'bar': ('baz', None, 1.0, 2)}])
     #req = json.dumps(req,  default=jsonDefault, indent=4)
     req = json.loads(reqdata)
@@ -50,6 +50,7 @@ def webget():
     if yql_query is None:
         return {}
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
+    print(yql_url)
     result = urlopen(yql_url).read()
     data = json.loads(result)
     
@@ -59,7 +60,10 @@ def webget():
     if time is None:
       time = ""
     else:
-      if time == "tomorrow":
+      
+      if time == "":
+        time = ""
+      elif time == "tomorrow":
         time = " Tomorrow "
       elif time == "yesterday":
         time = "yesterday"
@@ -92,10 +96,13 @@ def processRequest(req):
     result = req.get("result")
     parameters = result.get("parameters")
     time = parameters.get("time")
+    print("input time="+time)
     if time is None:
       time = ""
     else:
-      if time == "tomorrow":
+      if time == "":
+        time = ""
+      elif time == "tomorrow":
         time = " Tomorrow "
       elif time == "yesterday":
         time = "yesterday"
@@ -103,7 +110,7 @@ def processRequest(req):
         time = "After " + time + " days "
       else:
         time = ""
-
+    print("output time="+time)
     res = makeWebhookResult(data,time)
     return res
 
@@ -119,7 +126,9 @@ def makeYqlQuery(req):
     if time is None:
       time = ""
     else:
-      if time == "tomorrow":
+      if time == "":
+        time = ""
+      elif time == "tomorrow":
         time = " limit 2 "
       elif time == "yesterday":
         time = ""
